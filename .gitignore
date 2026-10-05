@@ -213,3 +213,4 @@ __marimo__/
 keys/
 *.tfstate*
 .terraform/
+*.parquet
