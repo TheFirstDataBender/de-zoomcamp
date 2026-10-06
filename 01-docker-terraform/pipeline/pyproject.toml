@@ -21,3 +21,9 @@ build-backend = "uv_build"
 
 [tool.uv]
 package = false
+
+[dependency-groups]
+dev = [
+    "pgcli>=4.7.1",
+    "psycopg[binary]>=3.3.6",
+]

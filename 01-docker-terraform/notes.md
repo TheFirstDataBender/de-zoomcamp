@@ -51,3 +51,30 @@
 - `uv run` failed in Docker: "Expected a Python module at src/pipeline/__init__.py"
 - Cause: newer uv set up the project as a package
 - Fix: added `package = false` under `[tool.uv]` in pyproject.toml, ran `uv lock`
+
+## Lesson 4 – Postgres in Docker
+
+**What I learned**
+- Postgres runs fully in a container, with nothing installed on the Mac
+- `-e` sets environment variables (user, password, database name)
+- `-p 5432:5432` = Mac port : container port, so Mac tools can reach the database
+- Named volume (`ny_taxi_postgres_data:/var/lib/postgresql`): Docker stores the
+  data, so it survives `--rm`. Proved it: stopped Postgres, restarted it, and
+  my test table was still there
+- Named volume vs bind mount: named = managed by Docker (better on Mac);
+  bind = a specific Mac folder (permission/speed issues on Mac)
+- Need two terminals: one runs Postgres (shows logs), one for working
+- `uv add --dev` = tools for development only (pgcli), kept separate from
+  the pipeline's real dependencies
+- pgcli: `\dt` lists tables, `\q` quits
+- Data lives in the volume, never in Git; the repo only holds code and config
+
+**What broke and how I fixed it**
+- pgcli crashed: "ImportError: no pq wrapper available"
+  - Cause: Mac doesn't ship libpq (the Postgres client library)
+  - Fix: `uv add --dev "psycopg[binary]"`, which bundles libpq
+- zsh needs quotes around square brackets: `"psycopg[binary]"`
+- In VS Code, Cmd+T opens symbol search, not a terminal; new terminal =
+  "+" in the terminal panel or Ctrl+Shift+`
+- If "port is already allocated": something else is using 5432; map
+  `-p 5433:5432` and connect with `-p 5433`
